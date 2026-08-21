@@ -14,27 +14,30 @@ jobs:
         run: |
           choco install anydesk -y --no-progress
 
-      - name: Configurar Senha e Iniciar
+      - name: Configurar e Gerar ID
         run: |
-          # Define a senha padrao
+          # Inicia o serviço do AnyDesk em segundo plano
+          & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --install "C:\ProgramData\AnyDesk" --start-with-win --silent
+          Start-Sleep -Seconds 10
+          
+          # Define a senha de acesso
           echo "SuaSenha123" | & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
+          Start-Sleep -Seconds 5
           
-          # Inicia o servico do AnyDesk
-          Start-Service anydesk -ErrorAction SilentlyContinue
-          Start-Process -FilePath "C:\Program Files (x86)\AnyDesk\AnyDesk.exe"
-          
-          # Aguarda 15 segundos para registrar na rede
-          Start-Sleep -Seconds 15
+          # Pega a ID gerada no arquivo de sistema
+          $config = Get-Content "C:\ProgramData\AnyDesk\system.conf" -ErrorAction SilentlyContinue | Select-String "ad.anydesk.id="
+          if ($config) {
+              $id = $config.ToString().Split('=')[1]
+              Write-Host "======================================"
+              Write-Host "SUA ID DO ANYDESK E: $id"
+              Write-Host "SENHA: SuaSenha123"
+              Write-Host "======================================"
+          } else {
+              Write-Host "Iniciando AnyDesk..."
+              & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
+          }
 
-      - name: Mostrar ID de Acesso
-        run: |
-          $id = & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
-          Write-Host "======================================"
-          Write-Host "SUA ID DO ANYDESK E: $id"
-          Write-Host "SENHA: SuaSenha123"
-          Write-Host "======================================"
-
-      - name: Manter Ativo
+      - name: Manter Conexao Ativa
         run: |
           while ($true) {
               Start-Sleep -Seconds 300
