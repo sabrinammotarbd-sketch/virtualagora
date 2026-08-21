@@ -10,32 +10,31 @@ jobs:
     timeout-minutes: 10080
 
     steps:
-      - name: Downloading & Installing AnyDesk
+      - name: Instalar AnyDesk
         run: |
           choco install anydesk -y --no-progress
 
-      - name: Log In To AnyDesk
+      - name: Configurar Senha e Iniciar
         run: |
-          # Define a senha de acesso remoto
+          # Define a senha padrao
           echo "SuaSenha123" | & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
           
-          # Aguarda a criação do arquivo de configuração
-          Start-Sleep -Seconds 10
+          # Inicia o servico do AnyDesk
+          Start-Service anydesk -ErrorAction SilentlyContinue
+          Start-Process -FilePath "C:\Program Files (x86)\AnyDesk\AnyDesk.exe"
           
-          # Extrai a ID diretamente do arquivo de sistema do AnyDesk
-          $configPath = "C:\ProgramData\AnyDesk\system.conf"
-          if (Test-Path $configPath) {
-              $idLine = Get-Content $configPath | Select-String "ad.anydesk.id="
-              $anydeskId = $idLine.ToString().Split('=')[1]
-              Write-Host "======================================"
-              Write-Host "SUA ID DO ANYDESK É: $anydeskId"
-              Write-Host "SUA SENHA É: SuaSenha123"
-              Write-Host "======================================"
-          } else {
-              Write-Host "Aguardando serviço gerar ID..."
-          }
+          # Aguarda 15 segundos para registrar na rede
+          Start-Sleep -Seconds 15
 
-      - name: Monitor and Keep Alive
+      - name: Mostrar ID de Acesso
+        run: |
+          $id = & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
+          Write-Host "======================================"
+          Write-Host "SUA ID DO ANYDESK E: $id"
+          Write-Host "SENHA: SuaSenha123"
+          Write-Host "======================================"
+
+      - name: Manter Ativo
         run: |
           while ($true) {
               Start-Sleep -Seconds 300
