@@ -7,7 +7,7 @@ jobs:
   build:
     name: Start Building...
     runs-on: windows-latest
-    timeout-minutes: 10080 # Máximo de 7 dias para execução
+    timeout-minutes: 10080
 
     steps:
       - name: Downloading & Installing AnyDesk
@@ -16,27 +16,27 @@ jobs:
 
       - name: Log In To AnyDesk
         run: |
-          # Define uma senha padrão para o AnyDesk (substitua 'SuaSenha123' se quiser)
+          # Define a senha de acesso remoto
           echo "SuaSenha123" | & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
           
-          # Obtém a ID de acesso do AnyDesk
-          $anydeskId = & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
-          Write-Host "======================================"
-          Write-Host "SUA ID DO ANYDESK É: $anydeskId"
-          Write-Host "SUA SENHA É: SuaSenha123"
-          Write-Host "======================================"
+          # Aguarda a criação do arquivo de configuração
+          Start-Sleep -Seconds 10
+          
+          # Extrai a ID diretamente do arquivo de sistema do AnyDesk
+          $configPath = "C:\ProgramData\AnyDesk\system.conf"
+          if (Test-Path $configPath) {
+              $idLine = Get-Content $configPath | Select-String "ad.anydesk.id="
+              $anydeskId = $idLine.ToString().Split('=')[1]
+              Write-Host "======================================"
+              Write-Host "SUA ID DO ANYDESK É: $anydeskId"
+              Write-Host "SUA SENHA É: SuaSenha123"
+              Write-Host "======================================"
+          } else {
+              Write-Host "Aguardando serviço gerar ID..."
+          }
 
       - name: Monitor and Keep Alive
         run: |
           while ($true) {
-              $process = Get-Process -Name "AnyDesk" -ErrorAction SilentlyContinue
-              if (-not $process) {
-                  Write-Host "Iniciando AnyDesk..."
-                  Start-Process -FilePath "C:\Program Files (x86)\AnyDesk\AnyDesk.exe"
-              }
               Start-Sleep -Seconds 300
           }
-
-      - name: Time Counter (Long Running Task)
-        run: |
-          Start-Sleep -Seconds 604800
