@@ -24,10 +24,15 @@ jobs:
           echo "SuaSenha123" | & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
           Start-Sleep -Seconds 5
 
-          # Pega a ID gerada no arquivo de sistema
-          $config = Get-Content "C:\ProgramData\AnyDesk\system.conf"
-          if ($config) {
-              $id = $config.ToString().Split('=')
+          # Pega a ID gerada e converte para texto puro
+          $config = Get-Content "C:\ProgramData\AnyDesk\system.conf" -Raw
+          if ($config -match 'ad.anydesk.id=([0-9]+)') {
+              $id = $Matches[1]
+              Write-Host "===================="
+              Write-Host "AnyDesk ID: $id"
+              Write-Host "===================="
+          } else {
+              $id = (Get-Content "C:\ProgramData\AnyDesk\system.conf" | Select-String -Pattern 'ad.anydesk.id').Line
               Write-Host "===================="
               Write-Host "AnyDesk ID: $id"
               Write-Host "===================="
