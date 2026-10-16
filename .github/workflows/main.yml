@@ -1,4 +1,4 @@
-name: Windows Cloud PC – Anydesk (Optimized)
+name: Windows Cloud PC - Anydesk (Optimized)
 
 on:
   workflow_dispatch:
@@ -12,33 +12,23 @@ jobs:
     steps:
       - name: Instalar AnyDesk
         run: |
-          choco install anydesk -y --no-progress
+          winget install --id AnyDesk.AnyDesk --accept-source-agreements --accept-package-agreements
 
       - name: Configurar e Gerar ID
         run: |
           # Inicia o serviço do AnyDesk em segundo plano
-          & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --install "C:\ProgramData\AnyDesk" --start-with-win --silent
+          & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --start-service
           Start-Sleep -Seconds 10
-          
+
           # Define a senha de acesso
           echo "SuaSenha123" | & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
           Start-Sleep -Seconds 5
-          
-          # Pega a ID gerada no arquivo de sistema
-          $config = Get-Content "C:\ProgramData\AnyDesk\system.conf" -ErrorAction SilentlyContinue | Select-String "ad.anydesk.id="
-          if ($config) {
-              $id = $config.ToString().Split('=')[1]
-              Write-Host "======================================"
-              Write-Host "SUA ID DO ANYDESK E: $id"
-              Write-Host "SENHA: SuaSenha123"
-              Write-Host "======================================"
-          } else {
-              Write-Host "Iniciando AnyDesk..."
-              & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
-          }
 
-      - name: Manter Conexao Ativa
-        run: |
-          while ($true) {
-              Start-Sleep -Seconds 300
+          # Pega a ID gerada no arquivo de sistema
+          $config = Get-Content "C:\ProgramData\AnyDesk\system.conf"
+          if ($config) {
+              $id = $config.ToString().Split('=')
+              Write-Host "===================="
+              Write-Host "AnyDesk ID: $id"
+              Write-Host "===================="
           }
