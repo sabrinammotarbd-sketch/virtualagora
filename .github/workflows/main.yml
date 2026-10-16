@@ -24,20 +24,9 @@ jobs:
           echo "SuaSenha123" | & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
           Start-Sleep -Seconds 5
 
-          # Procura pelo ID em todos os arquivos de configuração possíveis ou exibe a pasta
-          $idFile = Get-ChildItem -Path "C:\ProgramData\AnyDesk" -Filter "*.conf" -Recurse -ErrorAction SilentlyContinue
-          if ($idFile) {
-              foreach ($file in $idFile) {
-                  $content = Get-Content $file.FullName -Raw
-                  if ($content -match 'ad\.anydesk\.id\s*=\s*([0-9]+)') {
-                      Write-Host "===================="
-                      Write-Host "AnyDesk ID Encontrado: $($Matches[1])"
-                      Write-Host "===================="
-                      exit 0
-                  }
-              }
-          }
-
-          # Se não achar pelo filtro, lista o conteúdo da pasta para diagnosticarmos
-          Write-Host "ID não encontrado automaticamente. Listando arquivos na pasta do AnyDesk:"
-          Get-ChildItem -Path "C:\ProgramData\AnyDesk" -Recurse
+          # Exibe o conteúdo completo do system.conf para identificarmos o ID imediatamente
+          Write-Host "===================="
+          Write-Host "Conteudo do system.conf:"
+          Write-Host "===================="
+          Get-Content "C:\ProgramData\AnyDesk\system.conf"
+          Write-Host "===================="
