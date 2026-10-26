@@ -27,7 +27,6 @@ jobs:
         run: |
           Write-Host "A procurar o executável do AnyDesk..."
           
-          # Procura o AnyDesk em todos os locais possíveis
           $anydeskPath = "$env:APPDATA\AnyDesk\AnyDesk.exe"
           if (-Not (Test-Path $anydeskPath)) {
               $anydeskPath = "C:\Program Files\AnyDesk\AnyDesk.exe"
@@ -40,14 +39,26 @@ jobs:
           
           $password = "SuaSenhaForte123"
           
-          # Configura a senha de forma segura
-          $password | & "$anydeskPath" --set-password
+          # Configura a senha usando Start-Process de forma totalmente segura
+          $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+          $processInfo.FileName = $anydeskPath
+          $processInfo.Arguments = "--set-password"
+          $processInfo.RedirectStandardInput = $true
+          $processInfo.UseShellExecute = $false
+          
+          $process = [System.Diagnostics.Process]::Start($processInfo)
+          $sw = New-Object System.IO.StreamWriter($process.StandardInput)
+          $sw.WriteLine($password)
+          $sw.WriteLine($password)
+          $sw.Close()
+          $process.WaitForExit()
+          
           Write-Host "Senha configurada com sucesso!"
           
           # Obtém e imprime o ID do AnyDesk nos logs
-          $anydeskId = & "$anydeskPath" --get-id
           Write-Host "===================================="
-          Write-Host "SEU ID DO ANYDESK É: $anydeskId"
+          Write-Host "SEU ID DO ANYDESK:"
+          & $anydeskPath --get-id
           Write-Host "===================================="
 
       - name: Manter o PC Ligado
