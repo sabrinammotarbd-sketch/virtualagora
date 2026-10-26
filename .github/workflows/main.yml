@@ -1,4 +1,4 @@
-name: Windows Cloud PC - AnyDesk (Optimized)
+name: Windows Cloud PC - AnyDesk
 
 on:
   workflow_dispatch:
@@ -24,30 +24,13 @@ jobs:
           Write-Host "Instalação concluída com sucesso!"
 
       - name: Configurar Senha e Obter ID
+        shell: cmd
         run: |
-          Write-Host "A procurar o executável do AnyDesk..."
+          echo Configurando a senha...
+          echo SuaSenhaForte123 | "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
           
-          $anydeskPath = "C:\Program Files\AnyDesk\AnyDesk.exe"
-          if (-Not (Test-Path $anydeskPath)) {
-              $anydeskPath = "C:\Program Files (x86)\AnyDesk\AnyDesk.exe"
-          }
-          if (-Not (Test-Path $anydeskPath)) {
-              $anydeskPath = "$env:APPDATA\AnyDesk\AnyDesk.exe"
-          }
-          
-          Write-Host "Caminho encontrado: $anydeskPath"
-          
-          $password = "SuaSenhaForte123"
-          
-          # Define a senha usando o método seguro por pipeline com aspas corretas
-          $password | & "$anydeskPath" --set-password
-          Write-Host "Senha configurada com sucesso!"
-          
-          # Obtém e mostra o ID do AnyDesk nos logs
-          $anydeskId = & "$anydeskPath" --get-id
-          Write-Host "===================================="
-          Write-Host "SEU ID DO ANYDESK É: $anydeskId"
-          Write-Host "===================================="
+          echo Obtendo o ID...
+          "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
 
       - name: Manter o PC Ligado
         run: |
