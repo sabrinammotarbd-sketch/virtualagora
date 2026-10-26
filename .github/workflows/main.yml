@@ -23,8 +23,26 @@ jobs:
           Remove-Item $installerPath -ErrorAction SilentlyContinue
           Write-Host "Instalação concluída com sucesso!"
 
-      - name: Configurar e Gerar ID
+      - name: Configurar Senha e Obter ID
         run: |
-          Write-Host "A configurar ID do AnyDesk..."
-          # Adiciona aqui os teus comandos adicionais se necessário
-          Start-Service AnyDesk -ErrorAction SilentlyContinue
+          Write-Host "A configurar a senha de acesso..."
+          
+          # Escolha a sua senha aqui (substitua 'SuaSenhaForte123' pela senha que quiser usar)
+          $password = "SuaSenhaForte123"
+          
+          # Define a senha de acesso não atendido no AnyDesk
+          echo $password | & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
+          
+          Write-Host "Senha configurada com sucesso!"
+          
+          # Tenta obter e mostrar o ID do AnyDesk nos logs
+          $anydeskId = & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
+          Write-Host "===================================="
+          Write-Host "SEU ID DO ANYDESK É: $anydeskId"
+          Write-Host "===================================="
+
+      - name: Manter o PC Ligado
+        run: |
+          Write-Host "Cloud PC ligado e pronto a ser acedido!"
+          # Mantém o workflow ativo para você conseguir se conectar
+          Start-Sleep -Seconds 21600
