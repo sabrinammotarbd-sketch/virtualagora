@@ -27,20 +27,21 @@ jobs:
         run: |
           Write-Host "A procurar o executável do AnyDesk..."
           
-          # Procura o AnyDesk nos caminhos mais comuns (Program Files, Program Files (x86) ou AppData)
-          $anydeskPath = ${env:ProgramFiles(x86)} + "\AnyDesk\AnyDesk.exe"
+          $anydeskPath = "$env:APPDATA\AnyDesk\AnyDesk.exe"
           if (-Not (Test-Path $anydeskPath)) {
-              $anydeskPath = ${env:ProgramFiles} + "\AnyDesk\AnyDesk.exe"
+              $anydeskPath = "C:\Program Files (x86)\AnyDesk\AnyDesk.exe"
           }
           if (-Not (Test-Path $anydeskPath)) {
-              $anydeskPath = "$env:APPDATA\AnyDesk\AnyDesk.exe"
+              $anydeskPath = "C:\Program Files\AnyDesk\AnyDesk.exe"
           }
           
           Write-Host "Caminho encontrado: $anydeskPath"
           
-          # Define a senha de acesso não atendido (muda 'SuaSenhaForte123' para a senha que quiseres)
           $password = "SuaSenhaForte123"
-          echo $password | & $anydeskPath --set-password
+          
+          # Forma corrigida para passar a senha via pipeline no PowerShell para o AnyDesk
+          $password | & $anydeskPath --set-password
+          
           Write-Host "Senha configurada com sucesso!"
           
           # Obtém e mostra o ID do AnyDesk nos logs
