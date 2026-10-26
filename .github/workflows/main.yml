@@ -11,13 +11,20 @@ jobs:
       - name: Set up job
         run: echo "Iniciando a configuração do Cloud PC..."
 
-      - name: Instalar AnyDesk
+      - name: Instalar AnyDesk (Download Direto)
         run: |
-          winget install --id AnyDesk.AnyDesk --accept-source-agreements --accept-package-agreements --ignore-security-hash
+          $installerPath = "$env:TEMP\AnyDesk.exe"
+          Write-Host "A descarregar o AnyDesk..."
+          Invoke-WebRequest -Uri "https://download.anydesk.com/AnyDesk.exe" -OutFile $installerPath
+          
+          Write-Host "A instalar o AnyDesk..."
+          Start-Process -FilePath $installerPath -ArgumentList "--install", "--silent", "--accept-hw-id" -Wait
+          
+          Remove-Item $installerPath -ErrorAction SilentlyContinue
+          Write-Host "Instalação concluída com sucesso!"
 
       - name: Configurar e Gerar ID
         run: |
-          # Adiciona aqui os teus comandos de configuração do AnyDesk ou inicialização do serviço, se necessário
-          Write-Host "AnyDesk instalado com sucesso. A configurar ID..."
-          # Exemplo para garantir que o serviço está a correr:
+          Write-Host "A configurar ID do AnyDesk..."
+          # Adiciona aqui os teus comandos adicionais se necessário
           Start-Service AnyDesk -ErrorAction SilentlyContinue
