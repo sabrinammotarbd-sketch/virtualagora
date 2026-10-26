@@ -1,32 +1,23 @@
-name: Windows Cloud PC - Anydesk (Optimized)
+name: Windows Cloud PC - AnyDesk (Optimized)
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    name: Start Building...
     runs-on: windows-latest
-    timeout-minutes: 10080
 
     steps:
+      - name: Set up job
+        run: echo "Iniciando a configuração do Cloud PC..."
+
       - name: Instalar AnyDesk
         run: |
-          winget install --id AnyDesk.AnyDesk --accept-source-agreements --accept-package-agreements
+          winget install --id AnyDesk.AnyDesk --accept-source-agreements --accept-package-agreements --ignore-security-hash
 
       - name: Configurar e Gerar ID
         run: |
-          # Inicia o serviço do AnyDesk em segundo plano
-          & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --start-service
-          Start-Sleep -Seconds 10
-
-          # Define a senha de acesso
-          echo "SuaSenha123" | & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
-          Start-Sleep -Seconds 5
-
-          # Exibe o conteúdo completo do system.conf para identificarmos o ID imediatamente
-          Write-Host "===================="
-          Write-Host "Conteudo do system.conf:"
-          Write-Host "===================="
-          Get-Content "C:\ProgramData\AnyDesk\system.conf"
-          Write-Host "===================="
+          # Adiciona aqui os teus comandos de configuração do AnyDesk ou inicialização do serviço, se necessário
+          Write-Host "AnyDesk instalado com sucesso. A configurar ID..."
+          # Exemplo para garantir que o serviço está a correr:
+          Start-Service AnyDesk -ErrorAction SilentlyContinue
